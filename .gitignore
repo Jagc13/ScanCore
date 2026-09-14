@@ -1,0 +1,15 @@
+# CMake build output
+build/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# Compiled files
+*.exe
+*.o
+*.obj
+
+# VS Code local settings
+.vscode/
