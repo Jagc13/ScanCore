@@ -11,9 +11,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(scancore
     src/main.cpp
+    src/DeviceManager.cpp
 )
 
 target_include_directories(scancore
     PRIVATE
         ${PROJECT_SOURCE_DIR}/include
 )
+
+if(WIN32)
+    target_link_libraries(scancore
+        PRIVATE
+        setupapi
+    )
+endif()
