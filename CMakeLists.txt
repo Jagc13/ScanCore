@@ -40,17 +40,33 @@ target_link_libraries(scancore
 include(CTest)
 
 if(BUILD_TESTING)
+
+    # Task 3 - Barcode capture tests
     add_executable(capture_tests
         tests/BarcodeCaptureEngineTests.cpp
     )
 
     target_link_libraries(capture_tests
-        PRIVATE
-            scancore_core
+        PRIVATE scancore_core
     )
 
     add_test(
         NAME capture_tests
         COMMAND capture_tests
     )
+
+    # Task 5 - Asynchronous scanner tests
+    add_executable(scanner_service_tests
+        tests/ScannerServiceTests.cpp
+    )
+
+    target_link_libraries(scanner_service_tests
+        PRIVATE scancore_core
+    )
+
+    add_test(
+        NAME scanner_service_tests
+        COMMAND scanner_service_tests
+    )
+
 endif()

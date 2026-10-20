@@ -2,7 +2,9 @@
 #include <stdexcept>
 #include <utility>
 #ifdef _WIN32
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #include <algorithm>
 #include <system_error>
