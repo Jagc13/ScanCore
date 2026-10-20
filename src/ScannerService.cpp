@@ -22,18 +22,65 @@ ScannerService::~ScannerService()
 
 void ScannerService::start()
 {
+    startReading();
+}
+
+void ScannerService::stop()
+{
+    stopReading();
+}
+
+bool ScannerService::isRunning() const noexcept
+{
+    return running_.load();
+}
+
+ScannerState ScannerService::getState() const noexcept
+{
+    return state_.load();
+}
+
+void ScannerService::enable()
+{
+    if (state_.load() == ScannerState::Disconnected)
+    {
+        state_.store(ScannerState::Ready);
+    }
+}
+
+void ScannerService::disable()
+{
+    stopReading();
+    state_.store(ScannerState::Disconnected);
+}
+
+void ScannerService::startReading()
+{
+    const auto state = state_.load();
+
+    if (state == ScannerState::Disconnected)
+    {
+        throw std::runtime_error("Scanner is disabled");
+    }
+
+    if (state == ScannerState::Error)
+    {
+        throw std::runtime_error("Scanner is in error state");
+    }
+
     if (running_.load())
     {
         return;
     }
 
-    // Clean up a previous worker that has already finished.
+    // Join a previous worker before starting a new one.
     if (worker_.joinable())
     {
         worker_.join();
     }
 
     running_.store(true);
+    state_.store(ScannerState::Scanning);
 
     try
     {
@@ -42,11 +89,12 @@ void ScannerService::start()
     catch (...)
     {
         running_.store(false);
+        state_.store(ScannerState::Error);
         throw;
     }
 }
 
-void ScannerService::stop()
+void ScannerService::stopReading()
 {
     running_.store(false);
 
@@ -54,11 +102,12 @@ void ScannerService::stop()
     {
         worker_.join();
     }
-}
 
-bool ScannerService::isRunning() const noexcept
-{
-    return running_.load();
+    // Preserve an error or disabled state.
+    if (state_.load() == ScannerState::Scanning)
+    {
+        state_.store(ScannerState::Ready);
+    }
 }
 
 void ScannerService::setScanCallback(ScanCallback callback)
@@ -116,10 +165,13 @@ void ScannerService::workerLoop()
     {
         std::cerr << "Scanner worker error: "
                   << error.what() << '\n';
+
+        state_.store(ScannerState::Error);
     }
     catch (...)
     {
         std::cerr << "Unknown scanner worker error\n";
+        state_.store(ScannerState::Error);
     }
 
     running_.store(false);

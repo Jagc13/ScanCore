@@ -68,5 +68,17 @@ if(BUILD_TESTING)
         NAME scanner_service_tests
         COMMAND scanner_service_tests
     )
+    add_executable(scanner_state_tests
+    tests/ScannerStateTests.cpp
+    )
+
+     target_link_libraries(scanner_state_tests
+    PRIVATE scancore_core
+   )
+
+    add_test(
+    NAME scanner_state_tests
+    COMMAND scanner_state_tests
+   )
 
 endif()

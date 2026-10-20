@@ -2,6 +2,7 @@
 
 #include "scancore/BarcodeCaptureEngine.hpp"
 #include "scancore/IScannerConnection.hpp"
+#include "scancore/ScannerState.hpp"
 
 #include <atomic>
 #include <functional>
@@ -22,12 +23,21 @@ public:
     ScannerService(const ScannerService&) = delete;
     ScannerService& operator=(const ScannerService&) = delete;
 
+    // Task 5 - Background scanning
     void start();
     void stop();
-
     bool isRunning() const noexcept;
 
     void setScanCallback(ScanCallback callback);
+
+    // Task 6 - Scanner controls
+    void enable();
+    void disable();
+
+    void startReading();
+    void stopReading();
+
+    ScannerState getState() const noexcept;
 
 private:
     void workerLoop();
@@ -40,6 +50,9 @@ private:
 
     std::mutex callbackMutex_;
     ScanCallback callback_;
+
+    // Task 6 - Scanner state
+    std::atomic<ScannerState> state_{ScannerState::Ready};
 };
 
 } // namespace scancore
