@@ -82,3 +82,18 @@ if(BUILD_TESTING)
    )
 
 endif()
+# Task 7 - Qt GUI
+
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+
+add_executable(scancore_gui
+    gui/main.cpp
+    gui/MainWindow.cpp
+    gui/MainWindow.hpp
+)
+
+target_link_libraries(scancore_gui
+    PRIVATE
+        scancore_core
+        Qt6::Widgets
+)
